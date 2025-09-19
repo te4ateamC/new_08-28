@@ -15,4 +15,6 @@ import jp.te4a.teamc.spring.boot.bookapp.bean.OrderBean;
 
         @Query("SELECT X FROM OrderBean X ORDER BY X.title")
         List<OrderBean>findAllByOrderByTitleAsc();
+
+        
     }

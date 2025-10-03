@@ -17,7 +17,7 @@ public class ReservationService {
     @Autowired
     private ReservationRepository reservationRepository;
 
-    // ステータス更新
+    // ステータス更新（任意利用）
     public void updateStatus(String isbnCode, String status) {
         Optional<Reservation> optional = reservationRepository.findByIsbnCode(isbnCode);
         if (optional.isPresent()) {
@@ -31,6 +31,8 @@ public class ReservationService {
     public void approve(Map<String, String> params) {
         String title = params.get("title");
         String name = params.get("name");
+        String isbnCode = params.get("isbnCode");
+        String amountStr = params.get("amount");
 
         List<Reservation> allReservations = reservationRepository.findAll();
 
@@ -40,9 +42,13 @@ public class ReservationService {
 
         if (optional.isPresent()) {
             Reservation reservation = optional.get();
+            reservation.setIsbnCode(isbnCode);
+            reservation.setAmount(Integer.parseInt(amountStr));
             reservation.setApprovalStatus("承認済み");
             reservation.setApprovalDate(LocalDate.now());
             reservationRepository.save(reservation);
+        } else {
+            throw new RuntimeException("予約が見つかりません: " + title + ", " + name);
         }
     }
 

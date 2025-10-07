@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,25 +54,17 @@ public class ReservationService {
     }
 
     // 取引完了処理
-    public void complete(Map<String, String> params) {
-        String title = params.get("title");
-        String name = params.get("name");
-
-        List<Reservation> allReservations = reservationRepository.findAll();
-
-        Optional<Reservation> optional = allReservations.stream()
-                .filter(r -> r.getTitle().equals(title) && r.getName().equals(name))
-                .findFirst();
-
-        if (optional.isPresent()) {
-            Reservation reservation = optional.get();
-            reservation.setStatus("完了");
-            reservationRepository.save(reservation);
-        }
+    public void complete(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("予約が存在しません: " + id));
+        reservation.setCompleted(true); // 完了フラグをON
+        reservationRepository.save(reservation);
     }
 
-    // 全予約一覧を取得
     public List<Reservation> findAll() {
-        return reservationRepository.findAll();
+        // 完了してないもの → 完了したもの の順で並べて返す
+        List<Reservation> all = reservationRepository.findAll();
+        all.sort(Comparator.comparing(Reservation::isCompleted));
+        return all;
     }
 }

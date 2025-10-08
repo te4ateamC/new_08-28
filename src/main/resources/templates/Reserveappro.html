@@ -6,60 +6,62 @@
   <title>予約承認する</title>
   <link rel="stylesheet" href="/css/Reservation.css">
 </head>
-<header class="header">
-</header>
 
-<h2 class="ScreenTitle">予約承認画面</h2>
+<body>
+  <header class="header">
+  </header>
 
-<!-- エラーメッセージ表示 -->
-<p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red"></p>
+  <h2 class="ScreenTitle">予約承認画面</h2>
 
-<table>
-  <tr>
-    <th>書名(タイトル)</th>
-    <th class="publisherdisplay">出版社</th>
-    <th>冊</th>
-    <th class="namedisplay">名前</th>
-  </tr>
-  <tr>
-    <td id="title" class="data-cell" th:text="${title}"></td>
-    <td id="publisher" class="data-cell" th:text="${publisher}"></td>
-    <td id="count" class="data-cell" th:text="${count}"></td>
-    <td id="name" class="data-cell" th:text="${name}"></td>
-
-  </tr>
-</table>
-
-<br>
-
-<!-- 変更可能な入力フォーム -->
-<!--<form method="get" action="orderhistory.html" id="approvalForm">-->
-<form method="post" action="/reserveappro/confirm">
-  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-
-  <input type="hidden" name="title" th:value="${title}" />
-  <input type="hidden" name="publisher" th:value="${publisher}" />
-  <input type="hidden" name="count" th:value="${count}" />
-  <input type="hidden" name="name" th:value="${name}" />
+  <!-- エラーメッセージ表示 -->
+  <p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red"></p>
 
   <table>
     <tr>
-      <th>ISBNコード</th>
-      <td><input type="text" name="isbnCode" required /></td>
+      <th>書名(タイトル)</th>
+      <th class="publisherdisplay">出版社</th>
+      <th>冊</th>
+      <th class="namedisplay">名前</th>
     </tr>
     <tr>
-      <th>金額</th>
-      <td><input type="number" name="amount" required /></td>
+      <td id="title" class="data-cell" th:text="${title}"></td>
+      <td id="publisher" class="data-cell" th:text="${publisher}"></td>
+      <td id="count" class="data-cell" th:text="${count}"></td>
+      <td id="name" class="data-cell" th:text="${name}"></td>
+
     </tr>
   </table>
 
-  <input type="hidden" name="approvalDate" id="approvalDate" />
-  <input type="hidden" name="approvalStatus" value="承認済み" />
+  <br>
 
-  <button type="submit">確定</button>
-  <button type="button" onclick="location.href='/orderhistory'">戻る</button>
-</form>
+  <!-- 変更可能な入力フォーム -->
+  <!--<form method="get" action="orderhistory.html" id="approvalForm">-->
+  <form method="post" action="/reserveappro/confirm">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
+    <input type="hidden" name="title" th:value="${title}" />
+    <input type="hidden" name="publisher" th:value="${publisher}" />
+    <input type="hidden" name="count" th:value="${count}" />
+    <input type="hidden" name="name" th:value="${name}" />
+
+    <table>
+      <tr>
+        <th>ISBNコード</th>
+        <td><input type="text" name="isbnCode" required /></td>
+      </tr>
+      <tr>
+        <th>金額</th>
+        <td><input type="number" name="amount" required /></td>
+      </tr>
+    </table>
+
+    <input type="hidden" name="approvalDate" id="approvalDate" />
+    <input type="hidden" name="approvalStatus" value="承認済み" />
+
+    <button type="submit">確定</button>
+    <button type="button" onclick="location.href='/orderhistory'">戻る</button>
+  </form>
+</body>
 <script>
   // 承認日セット
   document.addEventListener("DOMContentLoaded", () => {

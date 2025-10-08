@@ -86,56 +86,87 @@
             const dialog = document.getElementById("trcom");
             let targetRow = null;
             let targetForm = null;
-
-            // 各行の「取引完了」ボタンにイベントを付与
+        
+            // === 1️⃣ localStorage から完了済タイトル一覧を取得 ===
+            let completedList = JSON.parse(localStorage.getItem("completedList") || "[]");
+        
+            // === 2️⃣ ページ表示時に完了状態を反映 ===
+            const tbody = document.querySelector("tbody");
+            const rows = Array.from(tbody.querySelectorAll("tr"));
+        
+            rows.forEach(row => {
+                const title = row.querySelector("td:nth-child(1)")?.textContent?.trim();
+                if (completedList.includes(title)) {
+                    row.classList.add("completed");
+                    const btn = row.querySelector(".complete-btn");
+                    if (btn) btn.disabled = true;
+                }
+            });
+        
+            // === 3️⃣ 完了済行を下に並べ替え ===
+            completedList.forEach(title => {
+                const matchRow = rows.find(row => row.querySelector("td:nth-child(1)")?.textContent?.trim() === title);
+                if (matchRow) tbody.appendChild(matchRow);
+            });
+        
+            // === 4️⃣ 「取引完了」ボタン押下時 ===
             document.querySelectorAll(".complete-btn").forEach(btn => {
                 btn.addEventListener("click", function (e) {
-                    e.preventDefault(); // フォーム送信を止める
+                    e.preventDefault();
                     targetRow = btn.closest("tr");
                     targetForm = btn.closest("form");
                     dialog.showModal();
                 });
             });
-
-            // 「キャンセル」
+        
+            // === 5️⃣ 「キャンセル」ボタン ===
             document.getElementById("cancelComplete").addEventListener("click", () => {
                 dialog.close();
                 targetRow = null;
                 targetForm = null;
             });
-
-            // 「完了」押下時
+        
+            // === 6️⃣ 「完了」ボタン ===
             document.getElementById("confirmComplete").addEventListener("click", () => {
                 if (!targetForm || !targetRow) return;
-
-                // フォーム内容をAjaxで送信
+        
                 const formData = new FormData(targetForm);
                 fetch(targetForm.action, {
                     method: targetForm.method,
                     body: formData
                 })
-                    .then(response => {
-                        if (!response.ok) throw new Error("サーバーエラー");
-                        return response.text(); // 必要ならJSONに変更
-                    })
-                    .then(() => {
-                        // 成功したらグレーアウト
-                        targetRow.classList.add("completed");
-                        targetRow.querySelector(".complete-btn").disabled = true;
-
-                        // 行を下に移動
-                        const tbody = targetRow.parentNode;
-                        tbody.appendChild(targetRow);
-
-                        dialog.close();
-                    })
-                    .catch(err => {
-                        console.error("通信エラー:", err);
-                        dialog.close();
-                    });
+                .then(response => {
+                    if (!response.ok) throw new Error("サーバーエラー");
+                    return response.text();
+                })
+                .then(() => {
+                    const title = targetRow.querySelector("td:nth-child(1)")?.textContent?.trim();
+                    if (!title) return;
+        
+                    // グレーアウト + ボタン無効化
+                    targetRow.classList.add("completed");
+                    targetRow.querySelector(".complete-btn").disabled = true;
+        
+                    // === 完了リストに追加 ===
+                    if (!completedList.includes(title)) {
+                        completedList.push(title);
+                        localStorage.setItem("completedList", JSON.stringify(completedList));
+                    }
+        
+                    // 行を一番下に移動
+                    tbody.appendChild(targetRow);
+        
+                    dialog.close();
+                })
+                .catch(err => {
+                    console.error("通信エラー:", err);
+                    dialog.close();
+                });
             });
         });
-    </script>
+        </script>
+        
+        
 </body>
 
 </html>
